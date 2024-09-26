@@ -1,0 +1,65 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <algorithm>
+
+class Parser{
+private:
+    std::ifstream file;
+public:
+    Parser(const std::string& filename) : file(filename) {}
+    
+    void read(int& N, int& M, std::vector<std::pair<int, int>>& Edges) {
+        int i = 0;
+        file >> N >> M;
+        Edges.resize(M);
+        for (i = 0; i < M; i++) {
+            file >> Edges[i].first >> Edges[i].second;
+        }
+    }
+};
+
+class Solver {
+private:
+    std::vector<std::pair<int, int>> edge_lst;
+    int Num;
+public:
+    Solver(const std::vector<std::pair<int, int>>& edges, int N) : edge_lst(edges), Num(N) {}
+    
+    
+    void Coloring(int* color) {
+        for (int i = 0; i < Num; ++i) {
+            color[i] = 1;
+        }
+        for (int i = 0; i < Num; i++) {
+            int vertex = i;
+            int chosenColor = 1;
+            for (const auto& edge : edge_lst) {
+                if (edge.first == vertex) {
+                    if (color[edge.second] == chosenColor) {
+                        chosenColor++;
+                    }
+                } else if (edge.second == vertex) {
+                    if (color[edge.first] == chosenColor) {
+                        chosenColor++;
+                    }
+                }
+            }
+            color[vertex] = chosenColor;
+        }
+    }
+};
+
+int main() {
+    Parser parser("input.txt");
+    int N, M;
+    std::vector<std::pair<int, int>> Edges;
+    parser.read(N, M, Edges);
+    Solver solver(Edges, N);
+    int color[N];
+    solver.Coloring(color);
+    for (int i = 0; i < N; i++) {
+        std::cout << "Vertex " << i << " colored " << color[i] << std::endl;
+    }
+    return 0;
+}
